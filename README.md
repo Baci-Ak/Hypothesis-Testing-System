@@ -1,4 +1,4 @@
-# Hypothesis-Testing-System-
+# Hypothesis-Testing-System
 <img width="808" alt="Screenshot 2023-07-20 at 10 51 00 PM" src="https://github.com/Baci-Ak/Hypothesis-Testing-System-/assets/134199508/40ae3b54-88f4-4c68-a302-02b5b255ecd1">
 
 
