@@ -20,7 +20,8 @@ The aim of this Hypothesis Testing System project is to develop a flexible and u
 
 * Data Visualization: The system provides users with a table containing relevant statistical information, including the mean of each observation, variance, observation size, Pearson correlation, t-statistic, p-values, and the difference in means.
 
-<img width="892" alt="Screenshot 2023-07-20 at 10 26 45 PM" src="https://github.com/Baci-Ak/Hypothesis-Testing-System-/assets/134199508/5c93d605-9694-4b02-be20-4764b5db80aa">
+<img width="907" alt="Screenshot 2023-07-21 at 3 27 51 PM" src="https://github.com/Baci-Ak/Hypothesis-Testing-System/assets/134199508/d7ecbff0-8722-46be-ad1c-d6687c054144">
+
 
 ##### 🧧 Usage:
 * Hypothesis Testing: Users can choose between a one-tailed or two-tailed test. For one-tailed tests, users can specify whether they want to test for a greater-than or less-than null hypothesis.
