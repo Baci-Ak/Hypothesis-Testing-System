@@ -26,25 +26,38 @@ This is a web-based application for conducting hypothesis tests using statistica
 ### Installation
 
 1. Clone the repository:
+
+    ```bash
     git clone https://github.com/Baci-Ak/Hypothesis-Testing-System.git
+    ```
 
 2. Navigate to the project directory:
-    cd Hypothesis-Testing-System
+
+    ```bash
+    cd hypothesis-testing-system
+    ```
 
 3. Install the required dependencies:
+
+    ```bash
     pip install -r requirements.txt
+    ```
 
 ### Usage
 
 1. Start the Flask server:
+
+    ```bash
     python app.py
+    ```
 
 2. Open your web browser and go to `http://localhost:5000`.
 
 3. Upload your dataset and perform hypothesis tests using the web interface.
 
 ### Screenshots
-<img width="757" alt="Screenshot 2024-05-11 at 10 50 37 PM" src="https://github.com/Baci-Ak/Hypothesis-Testing-System/assets/134199508/c2ee0bda-910b-4720-bf30-8b3d2e5c5295">
+<img width="757" alt="Screenshot 2024-05-11 at 10 50 37 PM" src="https://github.com/Baci-Ak/Hypothesis-Testing-System/assets/134199508/da372e60-dbfb-4ed0-b820-2ce85c8c003f">
+
 
 ## License
 
@@ -53,3 +66,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgments
 
 - This project was inspired by the need for a simple and intuitive tool for hypothesis testing.
+
+
