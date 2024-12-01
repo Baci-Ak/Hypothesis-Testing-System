@@ -1,18 +1,12 @@
-
 import os
 from flask import Flask, render_template, request, redirect, url_for, flash
-from werkzeug.utils import secure_filename
 import pandas as pd
+from io import BytesIO
 from user_Interface import hypothesis_System_interface
 
 app = Flask(__name__)
 
-UPLOAD_FOLDER = 'uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = '0456734'  # Set the secret key for the Flask app
-
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
 
 ALLOWED_EXTENSIONS = {'csv', 'xls', 'xlsx', 'sas7bdat'}
 
@@ -36,47 +30,50 @@ def upload_file():
         return redirect(request.url)
     
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        df = None
-        if filename.endswith('.sas7bdat'):
-            df = pd.read_sas(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        elif filename.endswith('.xlsx') or filename.endswith('.xls'):
-            df = pd.read_excel(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        else:
-            df = pd.read_csv(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        try:
+            # Read the file directly from memory
+            if file.filename.endswith('.sas7bdat'):
+                df = pd.read_sas(BytesIO(file.read()))
+            elif file.filename.endswith('.xlsx') or file.filename.endswith('.xls'):
+                df = pd.read_excel(file)
+            else:
+                df = pd.read_csv(file)
             
-        if df is not None:
             variable_options = df.columns.tolist()
-            filenames = os.listdir(app.config['UPLOAD_FOLDER'])
-            filenames.remove(filename)  # Remove the filename from the list
-            filenames.insert(0, filename)  # Insert the filename at the beginning of the list
-            return render_template('index.html', success='File uploaded successfully', filenames=filenames, variable_options=variable_options)
-        else:
-            flash('Unsupported file format. Please choose a CSV, Excel, or SAS7BDAT file.', 'error')
+            return render_template('index.html', success='File uploaded successfully', variable_options=variable_options, filename=file.filename)
+        except Exception as e:
+            flash(f'Error processing the file: {e}', 'error')
+            return redirect(url_for('index'))
     else:
         flash('Unsupported file format. Please choose a CSV, Excel, or SAS7BDAT file.', 'error')
     return redirect(url_for('index'))
 
 @app.route('/test', methods=['POST'])
 def perform_test():
-    filename = request.form['filename']
-    alpha = float(request.form['alpha'])
-    test_type = request.form['test_type']  
-    items = request.form['items']
-    
     try:
-        file_path = os.path.join(UPLOAD_FOLDER, filename)
-        if filename.endswith('.sas7bdat'):
-            df = pd.read_sas(file_path)
-        elif filename.endswith('.xlsx') or filename.endswith('.xls'):
-            df = pd.read_excel(file_path)
+        # Retrieve data sent from the form
+        file = request.files['file']
+        alpha = float(request.form['alpha'])
+        test_type = request.form['test_type']
+        items = request.form['items']
+        
+        # Process the uploaded file
+        if file and allowed_file(file.filename):
+            if file.filename.endswith('.sas7bdat'):
+                df = pd.read_sas(BytesIO(file.read()))
+            elif file.filename.endswith('.xlsx') or file.filename.endswith('.xls'):
+                df = pd.read_excel(file)
+            else:
+                df = pd.read_csv(file)
         else:
-            df = pd.read_csv(file_path)
+            flash('Invalid or missing file. Please upload a valid file.', 'error')
+            return redirect(url_for('index'))
+        
+        # Perform hypothesis testing
         results = hypothesis_System_interface(df, alpha, test_type, items)
         return render_template('result.html', results=results)
     except Exception as e:
-        flash(f'An error occurred: {str(e)}', 'error')
+        flash(f'An error occurred: {e}', 'error')
         return redirect(url_for('index'))
 
 @app.route('/quit', methods=['GET'])
@@ -85,23 +82,3 @@ def quit():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
