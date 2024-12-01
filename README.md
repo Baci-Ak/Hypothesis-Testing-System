@@ -13,7 +13,16 @@ This is a web-based application for conducting hypothesis tests using statistica
 - **Specify Items:** Users can specify the items to be tested within the uploaded dataset.
 - **Set Significance Level:** Users can set the significance level (alpha) for the hypothesis test.
 
+## Access the App
+Click [here](https://cryptic-island-02383-0a6272ca795d.herokuapp.com/) to try the **Hypothesis Testing System**.
+
+
+## Feedback
+Feel free to contribute or share feedback to make this tool even better!
 ## Getting Started
+
+
+
 
 ### Prerequisites
 
