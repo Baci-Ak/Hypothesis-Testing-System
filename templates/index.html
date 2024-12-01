@@ -11,6 +11,7 @@
 <body>
     <div class="container">
         <h1>Hypothesis Testing</h1>
+        <!-- Form for file upload -->
         <form action="/upload" method="post" enctype="multipart/form-data">
             <input type="file" name="file" id="file" accept=".csv, .xlsx, .xls, .sas7bdat">
             <label for="file">Choose a file (Accepted formats: CSV, Excel, SAS7BDAT)</label>
@@ -19,13 +20,20 @@
         {% if success %}
         <p style="color: green;">{{ success }}</p>
         {% endif %}
-        <form action="/test" method="post">
+        {% if error %}
+        <p style="color: red;">{{ error }}</p>
+        {% endif %}
+        
+        <!-- Form for hypothesis testing -->
+        <form action="/test" method="post" name="hypothesis-test-form">
+            {% if filenames %}
             <label for="filename">Select uploaded file:</label>
             <select name="filename" id="filename">
                 {% for filename in filenames %}
                 <option value="{{ filename }}">{{ filename }}</option>
                 {% endfor %}
             </select><br>
+            {% endif %}
             {% if variable_options %}
             <p>Available items for testing are: {{ variable_options|join(', ') }}</p>
             {% endif %}
@@ -34,13 +42,12 @@
                 <option value="one-tailed">One-tailed</option>
                 <option value="two-tailed">Two-tailed</option>
             </select><br>
-            <!-- Add a text input field for the items -->
             <label for="items">Enter the names of the items (comma-separated):</label>
             <input type="text" name="items" id="items"><br>
             <label for="alpha">Enter significance level (alpha):</label>
             <input type="text" name="alpha" id="alpha"><br>
             <input type="submit" value="Perform Hypothesis Test" style="background-color: #4CAF50;">
-        </form>        
+        </form>
     </div>
 </body>
 </html>
