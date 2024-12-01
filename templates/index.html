@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,56 +5,146 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hypothesis Testing System</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Basic Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="file"],
+        select,
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            input[type="file"],
+            select,
+            input[type="text"],
+            input[type="submit"] {
+                font-size: 14px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Hypothesis Testing</h1>
-        <!-- Form for file upload -->
+        <h1>Hypothesis Testing System</h1>
+        
+        <!-- File Upload Form -->
         <form action="/upload" method="post" enctype="multipart/form-data">
-            <input type="file" name="file" id="file" accept=".csv, .xlsx, .xls, .sas7bdat">
-            <label for="file">Choose a file (Accepted formats: CSV, Excel, SAS7BDAT)</label>
-            <input type="submit" value="Upload File" style="background-color: #4CAF50;">
+            <label for="file">Upload a File (CSV, Excel, SAS7BDAT):</label>
+            <input type="file" name="file" id="file" accept=".csv, .xlsx, .xls, .sas7bdat" required>
+            <input type="submit" value="Upload File">
         </form>
+
+        <!-- Success and Error Messages -->
         {% if success %}
-        <p style="color: green;">{{ success }}</p>
+        <p class="message success">{{ success }}</p>
         {% endif %}
         {% if error %}
-        <p style="color: red;">{{ error }}</p>
+        <p class="message error">{{ error }}</p>
         {% endif %}
-        
-        <!-- Form for hypothesis testing -->
+
+        <!-- Hypothesis Testing Form -->
         <form action="/test" method="post" name="hypothesis-test-form">
             {% if filenames %}
-            <label for="filename">Select uploaded file:</label>
-            <select name="filename" id="filename">
+            <label for="filename">Select Uploaded File:</label>
+            <select name="filename" id="filename" required>
+                <option value="" disabled selected>-- Select a file --</option>
                 {% for filename in filenames %}
                 <option value="{{ filename }}">{{ filename }}</option>
                 {% endfor %}
-            </select><br>
+            </select>
             {% endif %}
+            
             {% if variable_options %}
-            <p>Available items for testing are: {{ variable_options|join(', ') }}</p>
+            <p>Available Variables: {{ variable_options|join(', ') }}</p>
             {% endif %}
-            <label for="test_type">Select test type:</label>
-            <select name="test_type" id="test_type">
+
+            <label for="test_type">Select Test Type:</label>
+            <select name="test_type" id="test_type" required>
+                <option value="" disabled selected>-- Select a test type --</option>
                 <option value="one-tailed">One-tailed</option>
                 <option value="two-tailed">Two-tailed</option>
-            </select><br>
-            <label for="items">Enter the names of the items (comma-separated):</label>
-            <input type="text" name="items" id="items"><br>
-            <label for="alpha">Enter significance level (alpha):</label>
-            <input type="text" name="alpha" id="alpha"><br>
-            <input type="submit" value="Perform Hypothesis Test" style="background-color: #4CAF50;">
+            </select>
+
+            <label for="items">Enter Variables (comma-separated):</label>
+            <input type="text" name="items" id="items" placeholder="e.g., Variable1, Variable2" required>
+
+            <label for="alpha">Enter Significance Level (Alpha):</label>
+            <input type="text" name="alpha" id="alpha" placeholder="Enter a value between 0 and 1" pattern="0(\.\d+)?|1(\.0+)?" required>
+
+            <input type="submit" value="Perform Hypothesis Test">
         </form>
     </div>
 </body>
 </html>
-
-
-
- 
-
-
-
-
-
