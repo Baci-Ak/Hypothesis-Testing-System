@@ -15,7 +15,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 20px auto;
             background: white;
             padding: 20px;
@@ -23,8 +23,26 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        h1 {
-            text-align: center;
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            max-height: 50px;
+            margin-right: 10px;
+        }
+
+        .logo h1 {
+            margin: 0;
+            font-size: 24px;
             color: #333;
         }
 
@@ -80,31 +98,60 @@
             border: 1px solid #f5c6cb;
         }
 
+        /* Suggestions Box */
+        .suggestions {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: white;
+            max-height: 150px;
+            overflow-y: auto;
+            position: absolute;
+            z-index: 10;
+            width: calc(100% - 20px);
+        }
+
+        .suggestion-item {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .suggestion-item:hover {
+            background-color: #f0f0f0;
+        }
+
         /* Responsive Design */
         @media (max-width: 600px) {
+            .logo h1 {
+                font-size: 18px;
+            }
+
             input[type="file"],
             select,
             input[type="text"],
             input[type="submit"] {
                 font-size: 14px;
             }
-
-            h1 {
-                font-size: 20px;
-            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Hypothesis Testing System</h1>
-        
+        <div class="header">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+                <h1>Hypothesis Testing System</h1>
+            </div>
+        </div>
+
         <!-- File Upload Form -->
         <form action="/upload" method="post" enctype="multipart/form-data">
             <label for="file">Upload a File (CSV, Excel, SAS7BDAT):</label>
             <input type="file" name="file" id="file" accept=".csv, .xlsx, .xls, .sas7bdat" required>
             <input type="submit" value="Upload File">
         </form>
+
+        <!-- Display Uploaded Data Columns -->
+        <p><strong id="available-variables">Available Variables:</strong></p>
 
         <!-- Success and Error Messages -->
         {% if success %}
@@ -118,16 +165,12 @@
         <form action="/test" method="post" name="hypothesis-test-form">
             {% if filenames %}
             <label for="filename">Select Uploaded File:</label>
-            <select name="filename" id="filename" required>
+            <select name="filename" id="filename" onchange="loadColumns()" required>
                 <option value="" disabled selected>-- Select a file --</option>
                 {% for filename in filenames %}
                 <option value="{{ filename }}">{{ filename }}</option>
                 {% endfor %}
             </select>
-            {% endif %}
-            
-            {% if variable_options %}
-            <p>Available Variables: {{ variable_options|join(', ') }}</p>
             {% endif %}
 
             <label for="test_type">Select Test Type:</label>
@@ -138,7 +181,8 @@
             </select>
 
             <label for="items">Enter Variables (comma-separated):</label>
-            <input type="text" name="items" id="items" placeholder="e.g., Variable1, Variable2" required>
+            <input type="text" name="items" id="items" placeholder="e.g., Variable1, Variable2" oninput="showSuggestions(this.value)" required>
+            <div id="suggestions" class="suggestions"></div>
 
             <label for="alpha">Enter Significance Level (Alpha):</label>
             <input type="text" name="alpha" id="alpha" placeholder="Enter a value between 0 and 1" pattern="0(\.\d+)?|1(\.0+)?" required>
@@ -146,5 +190,54 @@
             <input type="submit" value="Perform Hypothesis Test">
         </form>
     </div>
+
+    <script>
+        let columns = [];
+
+        function loadColumns() {
+            const selectedFile = document.getElementById('filename').value;
+            fetch(`/get_columns?file=${selectedFile}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.columns) {
+                        columns = data.columns;
+                        document.getElementById('available-variables').textContent = `Available Variables: ${columns.join(', ')}`;
+                    } else {
+                        document.getElementById('available-variables').textContent = 'Available Variables: None';
+                        columns = [];
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching columns:', error);
+                });
+        }
+
+        function showSuggestions(value) {
+            const suggestionsDiv = document.getElementById('suggestions');
+            suggestionsDiv.innerHTML = '';
+
+            if (!value) return;
+
+            const userInput = value.toLowerCase();
+            const matches = columns.filter(col => col.toLowerCase().includes(userInput));
+
+            if (matches.length === 0) {
+                suggestionsDiv.innerHTML = `<div class="suggestion-item">No matching column found. Check spelling!</div>`;
+                return;
+            }
+
+            matches.forEach(match => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.textContent = match;
+                div.onclick = () => {
+                    const inputField = document.getElementById('items');
+                    inputField.value = match;
+                    suggestionsDiv.innerHTML = '';
+                };
+                suggestionsDiv.appendChild(div);
+            });
+        }
+    </script>
 </body>
 </html>
